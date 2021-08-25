@@ -1,0 +1,25 @@
+{% extends 'core/base_user.html' %}
+
+{% block title %}
+Groups
+{% endblock %}
+
+{% block content %}
+
+
+
+    {%if groups_list %}
+        {% for group in groups_list %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{group.groupName}}</h1>
+        <a href="{% url 'core:addMember' group.pk %}" class='btn btn-success btn-sm '>Add member</a>
+          <br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No groups</h1>
+    {%endif%}
+    
+      
+
+
+{% endblock %}

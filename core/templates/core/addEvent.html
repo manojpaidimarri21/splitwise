@@ -1,0 +1,52 @@
+
+{% extends 'core/base_user.html' %}}
+
+
+{% block title %}
+Add Event
+{% endblock %}
+
+
+{% block content %}
+<br><br><br><br><br><br>
+<div class="container">
+  <div class="card">
+    <div class="card-header text-center">
+
+      <h1>Add Event</h1>
+    </div>
+    <div class="card-body text-center">
+      <div class="container">
+        <form enctype="multipart/form-data" method="post">
+          {% csrf_token %}
+          <div class="form-row ">
+            {% for message in messages %}
+            <p style="color: red;">{{ message }}</p><br>
+            {% endfor %}
+            {% for field in form %}
+              <div class="form-group text-center col-md-6 mb-0">
+                {{ field.label_tag }}<br>
+                {{ field }}<br>
+              </div>
+            {% endfor %}
+          </div>
+          {% if field.help_text %}
+          <small style="color: grey;">{{ field.help_text }}</small><br>
+          {% endif %}
+          {% for error in field.errors %}
+          <p style="color: red;">{{ error }}</p><br>
+          {% endfor %}
+          
+          <br>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+          </div>
+          <hr>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

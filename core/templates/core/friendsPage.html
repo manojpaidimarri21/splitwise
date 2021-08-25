@@ -1,0 +1,35 @@
+
+{% extends 'core/base_user.html' %}
+
+{% block title %}
+Friends
+{% endblock %}
+
+{% block content %}
+
+
+
+    {%if friends_list%}
+        {% for friend in friends_list %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{friend.username}}</h1>
+          <br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Friends</h1>
+    {%endif%}
+    {%if not_friends_list%}
+        {% for not_friend in not_friends_list %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;" >{{not_friend.username}}</h1>
+        <a href="{% url 'core:addFriend' not_friend.pk %}" class='btn btn-success btn-sm '>Add</a>
+          <br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Friends to add</h1>
+    {%endif%}
+
+      
+
+
+{% endblock %}

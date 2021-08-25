@@ -1,0 +1,12 @@
+{% extends './base_user.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<br><br>
+<a href="{% url 'core:friendsPage'  %}" class='btn btn-success btn-sm '>Friends</a>
+<a href="{% url 'core:groupsPage'  %}" class='btn btn-success btn-sm '>Groups</a>
+<a href="{% url 'core:groupCreate'  %}" class='btn btn-success btn-sm '> Create Group</a>
+<a href="{% url 'core:eventCreate'  %}" class='btn btn-success btn-sm '> Create Event</a>
+
+{% endblock %}
