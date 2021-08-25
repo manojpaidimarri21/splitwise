@@ -19,4 +19,7 @@ urlpatterns = [
     path('groups/', views.groupsPage, name='groupsPage'),
     path('addMember/<pk>', views.addMember, name='addMember'),
     path('eventCreate/', views.eventCreate, name='eventCreate'),
+    
+    path('debts/', views.debts, name='debtsPage'),
+    path('settle/<pk>', views.settle, name='settle'),
 ]

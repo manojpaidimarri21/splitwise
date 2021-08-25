@@ -1,0 +1,12 @@
+{% extends './base_user.html' %}
+
+{% block title %}Settle{% endblock %}
+
+{% block content %}
+<h1 class='mt-5' style="text-align:center; color:#00796b;">{{debt.groupName}}-{{debt.groupAdmin.username}}---{{debt.user1.username}} -------> {{debt.user2.username}} </h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+{% endblock %}

@@ -2,7 +2,7 @@
 from django import forms
   
 # import GeeksModel from models.py
-from .models import Group,Event
+from .models import Group,Event,Settelment
   
 # create a ModelForm
 class GroupForm(forms.ModelForm):
@@ -25,3 +25,10 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         exclude = ['created_by']
+
+# create a ModelForm
+class SettelmentForm(forms.ModelForm):
+    # specify the name of model to use
+    class Meta:
+        model = Settelment
+        fields = ['amount']

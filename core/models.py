@@ -37,9 +37,10 @@ class Debt(models.Model):
     def __str__(self):
         return self.groupName + '-' + self.user1.username + '-' + self.user2.username 
 
-
+##user 1 paid to user 2 amount positive
 class Settelment(models.Model):
     groupName = models.CharField(max_length=128)
+    groupAdmin = models.ForeignKey(User,on_delete=models.CASCADE, related_name="SettleAdmin",default=1)
     user1 = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user1Settelment")
     user2 = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user2Settelment")
     amount = models.DecimalField(max_digits=15, decimal_places=2)

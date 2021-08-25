@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from core.models import Friend,Group,Debt,Event
 from django.contrib.auth.models import User
 # Create your views here.
-from .forms import GroupForm,GroupFormAddMember,EventForm
+from .forms import GroupForm,GroupFormAddMember,EventForm,SettelmentForm
 from django.http import HttpResponse
 
 def minOf2(x, y):
@@ -199,3 +199,30 @@ def eventCreate(request):
         form=EventForm(request.POST)
 
     return render(request,'core/addEvent.html',{'form':form , 'messages':messages})
+
+ 
+def debts(request):
+    debts_of_user = Debt.objects.filter(user1 = request.user) | Debt.objects.filter(user2 = request.user)
+    return render(request,'core/debts.html',{'debts_of_user':debts_of_user })
+
+
+def settle(request,pk):
+    debt = Debt.objects.get(id = pk)
+    if  request.method == 'POST':
+        form=SettelmentForm(request.POST)
+        if form.is_valid():
+            instance=form.save(commit=False)
+            instance.groupName=debt.groupName
+            instance.groupAdmin=debt.groupAdmin
+            instance.user1 = debt.user1
+            instance.user2 = debt.user2
+            instance.save()
+            debt.amount -= instance.amount 
+            debt.save()
+            return redirect('core:home')
+        else:
+            print("Form is invalid")
+    else:
+        form=SettelmentForm()
+
+    return render(request,'core/settle.html',{'debt':debt,'form':form })

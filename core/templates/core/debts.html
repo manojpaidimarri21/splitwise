@@ -1,0 +1,33 @@
+
+{% extends 'core/base_user.html' %}
+
+{% block title %}
+Debts
+{% endblock %}
+
+{% block content %}
+
+
+
+    {%if debts_of_user%}
+        {% for debt in debts_of_user %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{debt.groupName}}-{{debt.groupAdmin.username}}---{{debt.user1.username}} -------> {{debt.user2.username}} </h1>
+        
+        {%if debt.amount > 0%}
+        <h1 class='mt-5' style="text-align:center; color:#200079;">{{debt.amount}}</h1>
+        {%else%}
+        <h1 class='mt-5' style="text-align:center; color:#ce3434;">{{debt.amount}}</h1>
+        {%endif%}
+        <a href="{% url 'core:settle' debt.pk %}" class='btn btn-success btn-sm '>Pay</a>
+          <br><br><br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Debts</h1>
+    {%endif%}
+    
+
+      
+
+
+{% endblock %}
