@@ -38,15 +38,15 @@ class Debt(models.Model):
         return self.groupName + '-' + self.user1.username + '-' + self.user2.username 
 
 ##user 1 paid to user 2 amount positive
-class Settelment(models.Model):
+class settlement(models.Model):
     groupName = models.CharField(max_length=128)
     groupAdmin = models.ForeignKey(User,on_delete=models.CASCADE, related_name="SettleAdmin",default=1)
-    user1 = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user1Settelment")
-    user2 = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user2Settelment")
+    user1 = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user1settlement")
+    user2 = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user2settlement")
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     done_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.groupName + '-' + self.user1.username + '-' + self.user2.username + '-' + self.amount + '-' + self.created_at
+        return self.groupName + '-' + self.user1.username + '-' + self.user2.username 
 
 
 class Event(models.Model):

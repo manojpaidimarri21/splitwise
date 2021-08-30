@@ -1,0 +1,78 @@
+
+{% extends 'core/base_user.html' %}
+
+{% block title %}
+Group Info
+{% endblock %}
+
+{% block content %}
+
+    <h1>{{group_name}}</h1>
+    
+    <h2>Group Members</h2>
+    {%if members%}
+        {% for mem in members %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{mem.username}}</h1>
+          <br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Members</h1>
+    {%endif%}
+
+    <h2> Group Debts </h2>
+    {%if group_debts%}
+        {% for debt in group_debts %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{debt.groupName}}-{{debt.groupAdmin.username}}---{{debt.user1.username}} -------> {{debt.user2.username}} </h1>
+        
+        {%if debt.amount > 0%}
+        <h1 class='mt-5' style="text-align:center; color:#200079;">{{debt.amount}}</h1>
+        {%else%}
+        <h1 class='mt-5' style="text-align:center; color:#ce3434;">{{debt.amount}}</h1>
+        {%endif%}
+        <a href="{% url 'core:settle' debt.pk %}" class='btn btn-success btn-sm '>Pay</a>
+          <br><br><br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Debts</h1>
+    {%endif%}
+
+    <h2>Group Settlements</h2>
+    {%if group_settlements%}
+        {% for debt in group_settlements %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{debt.groupName}}-{{debt.groupAdmin.username}}---{{debt.user1.username}} -------> {{debt.user2.username}} </h1>
+        
+        {%if debt.amount > 0%}
+        <h1 class='mt-5' style="text-align:center; color:#200079;">{{debt.amount}}</h1>
+        {%else%}
+        <h1 class='mt-5' style="text-align:center; color:#ce3434;">{{debt.amount}}</h1>
+        {%endif%}
+        
+          <br><br><br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Settlements</h1>
+    {%endif%}
+
+    <h2>Group Events</h2>
+    {%if group_events%}
+        {% for event in group_events %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{event.groupName}}-{{event.groupAdmin.username}}---{{event.payers}} -------> {{debt.bearers}} </h1>
+        
+       
+          <br><br><br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Events</h1>
+    {%endif%}
+
+
+    
+
+      
+
+
+{% endblock %}

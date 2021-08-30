@@ -1,10 +1,10 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from core.models import Friend,Group,Debt,Event
+from core.models import Friend,Group,Debt,Event,settlement
 from django.contrib.auth.models import User
 # Create your views here.
-from .forms import GroupForm,GroupFormAddMember,EventForm,SettelmentForm
+from .forms import GroupForm,GroupFormAddMember,EventForm,settlementForm
 from django.http import HttpResponse
 
 def minOf2(x, y):
@@ -205,11 +205,14 @@ def debts(request):
     debts_of_user = Debt.objects.filter(user1 = request.user) | Debt.objects.filter(user2 = request.user)
     return render(request,'core/debts.html',{'debts_of_user':debts_of_user })
 
+def settlements(request):
+    settlements_of_user = settlement.objects.filter(user1 = request.user) | settlement.objects.filter(user2 = request.user)
+    return render(request,'core/settlements.html',{'settlements_of_user':settlements_of_user })
 
 def settle(request,pk):
     debt = Debt.objects.get(id = pk)
     if  request.method == 'POST':
-        form=SettelmentForm(request.POST)
+        form=settlementForm(request.POST)
         if form.is_valid():
             instance=form.save(commit=False)
             instance.groupName=debt.groupName
@@ -223,6 +226,21 @@ def settle(request,pk):
         else:
             print("Form is invalid")
     else:
-        form=SettelmentForm()
+        form=settlementForm()
 
     return render(request,'core/settle.html',{'debt':debt,'form':form })
+
+def groupInfo(request,pk):
+    group = Group.objects.get(id = pk)
+    group_name = group.groupName
+    group_admin = group.groupAdmin
+    members  = []
+    members.append(group_admin)
+    member_objects = Group.objects.filter(groupName = group_name,groupAdmin = group_admin)
+    for mem in member_objects:
+        members.append(mem.member)
+    
+    group_debts = Debt.objects.filter(groupName = group_name,groupAdmin = group_admin)
+    group_settlements = settlement.objects.filter(groupName = group_name,groupAdmin = group_admin)
+    group_events = Event.objects.filter(groupName = group_name,groupAdmin = group_admin)
+    return render(request,'core/groupInfo.html',{'group_name':group_name,'group_admin':group_admin,'members':members,'group_debts':group_debts,'group_settlements':group_settlements,'group_events':group_events})
