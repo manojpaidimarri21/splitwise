@@ -21,5 +21,7 @@ urlpatterns = [
     path('eventCreate/', views.eventCreate, name='eventCreate'),
     
     path('debts/', views.debts, name='debtsPage'),
+    path('settlements/', views.settlements, name='settlementsPage'),
     path('settle/<pk>', views.settle, name='settle'),
+    path('groupInfo/<pk>',views.groupInfo, name='groupInfo')
 ]

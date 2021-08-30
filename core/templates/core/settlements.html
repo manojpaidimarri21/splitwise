@@ -1,0 +1,30 @@
+
+{% extends 'core/base_user.html' %}
+
+{% block title %}
+Settlements
+{% endblock %}
+
+{% block content %}
+
+    {%if settlements_of_user%}
+        {% for settlement in settlements_of_user %}
+
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{settlement.groupName}}-{{settlement.groupAdmin.username}}---{{settlement.user1.username}} -------> {{settlement.user2.username}} -------- {{settlement.done_at}} </h1>
+        
+        {%if settlement.amount > 0%}
+        <h1 class='mt-5' style="text-align:center; color:#200079;">{{settlement.amount}}</h1>
+        {%else%}
+        <h1 class='mt-5' style="text-align:center; color:#ce3434;">{{settlement.amount}}</h1>
+        {%endif%}
+          <br><br><br>
+          {% endfor %}
+          {%else%}
+           <h1 class='mt-5' style="text-align:center; color:#00796b;" >No Settlements</h1>
+    {%endif%}
+    
+
+      
+
+
+{% endblock %}
