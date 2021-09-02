@@ -154,14 +154,15 @@ def eventCreate(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.created_by = request.user
-            instance.save()
             print(instance)
             if (instance.eventType == 'equal'):
                 payers = eval(instance.payers)
                 print(payers)
+                
                 total_event_paid = 0
                 for paid_amount in payers.values():
                     total_event_paid=total_event_paid+paid_amount
+                
                 group_objects = Group.objects.filter(groupName = instance.groupName,groupAdmin = instance.groupAdmin)
                 totol_members_in_group=1
                 group_members_net_amount = { instance.groupAdmin.username : 0 }
@@ -176,8 +177,10 @@ def eventCreate(request):
                     group_members_net_amount[group_initial_debt.user2.username]  =  float(group_initial_debt.amount)
                 group_initial_debts.delete()
                 print(group_members_net_amount) 
+                
                 for payer in payers:
                     group_members_net_amount[payer] = group_members_net_amount[payer] + payers[payer]
+                
                 each_person_amount = total_event_paid/totol_members_in_group 
                 for person in group_members_net_amount:
                     group_members_net_amount[person] = group_members_net_amount[person] - float(each_person_amount)
@@ -186,13 +189,59 @@ def eventCreate(request):
                 debts_list =[]
                 debts_converter(group_members_net_amount,debts_list)
                 print(debts_list)
-
+                instance.save()
                 for debt in debts_list:
                     user1= User.objects.get(username =debt[0])
                     user2= User.objects.get(username =debt[1])
                     debt_temp = Debt(groupName=instance.groupName,groupAdmin=instance.groupAdmin,user1=user1,user2=user2,amount = debt[2])
                     debt_temp.save()
+            elif ( instance.eventType == 'unequal'):
+                payers = eval(instance.payers)
+                print(payers)
+                bearers = eval(instance.bearers)
+                total_event_paid = 0
+                for paid_amount in payers.values():
+                    total_event_paid=total_event_paid+paid_amount
+                total_event_bear = 0
+                for paid_amount in bearers.values():
+                    total_event_bear=total_event_bear+paid_amount
+                if(total_event_paid!=total_event_bear):
+                    messages.append("total amount of payers not equal to bearers!!")
+                    print(messages)
+                    return render(request,'core/addEvent.html',{'form':form , 'messages':messages})
+                group_objects = Group.objects.filter(groupName = instance.groupName,groupAdmin = instance.groupAdmin)
+                totol_members_in_group=1
+                group_members_net_amount = { instance.groupAdmin.username : 0 }
+                for group_object in group_objects:
+                    group_members_net_amount[group_object.member.username] = 0
+                    totol_members_in_group +=1
+                
+                group_initial_debts = Debt.objects.filter(groupName = instance.groupName,groupAdmin = instance.groupAdmin)
+                print(group_initial_debts)
+                for group_initial_debt in group_initial_debts:
+                    group_members_net_amount[group_initial_debt.user1.username]  = -float(group_initial_debt.amount)
+                    group_members_net_amount[group_initial_debt.user2.username]  =  float(group_initial_debt.amount)
+                group_initial_debts.delete()
+                print(group_members_net_amount) 
+                
+                for payer in payers:
+                    group_members_net_amount[payer] = group_members_net_amount[payer] + payers[payer]
+                for bearer in bearers:
+                    group_members_net_amount[bearer] = group_members_net_amount[bearer] - bearers[bearer]
+                print(group_members_net_amount)
+
+                debts_list =[]
+                debts_converter(group_members_net_amount,debts_list)
+                print(debts_list)
+                instance.save()
+                for debt in debts_list:
+                    user1= User.objects.get(username =debt[0])
+                    user2= User.objects.get(username =debt[1])
+                    debt_temp = Debt(groupName=instance.groupName,groupAdmin=instance.groupAdmin,user1=user1,user2=user2,amount = debt[2])
+                    debt_temp.save()    
             return redirect('core:home')
+            
+    
         else:
             print("Form is invalid")
     else:
@@ -221,7 +270,10 @@ def settle(request,pk):
             instance.user2 = debt.user2
             instance.save()
             debt.amount -= instance.amount 
-            debt.save()
+            if(debt.amount==0):
+                debt.delete()
+            else:
+                debt.save()
             return redirect('core:home')
         else:
             print("Form is invalid")
@@ -241,6 +293,54 @@ def groupInfo(request,pk):
         members.append(mem.member)
     
     group_debts = Debt.objects.filter(groupName = group_name,groupAdmin = group_admin)
+    group_personal_debts = {}
+    for member in members:
+        total=0
+        person_debts_as_user1 = Debt.objects.filter(groupName = group_name,groupAdmin = group_admin,user1=member)
+        person_debts_as_user2 =Debt.objects.filter(groupName = group_name,groupAdmin = group_admin,user2=member)
+        for debt in person_debts_as_user1:
+            total=total-float(debt.amount)
+        for debt in person_debts_as_user2:
+            total=total+float(debt.amount)
+        group_personal_debts[member.username] = total
     group_settlements = settlement.objects.filter(groupName = group_name,groupAdmin = group_admin)
     group_events = Event.objects.filter(groupName = group_name,groupAdmin = group_admin)
-    return render(request,'core/groupInfo.html',{'group_name':group_name,'group_admin':group_admin,'members':members,'group_debts':group_debts,'group_settlements':group_settlements,'group_events':group_events})
+    return render(request,'core/groupInfo.html',{'group_name':group_name,'group_admin':group_admin,'members':members,'group_personal_debts':group_personal_debts,'group_debts':group_debts,'group_settlements':group_settlements,'group_events':group_events})
+
+def activity(request):
+    user_settlements = settlement.objects.filter(user1=request.user) | settlement.objects.filter(user2=request.user)
+    groups_list = Group.objects.filter(member=request.user) | Group.objects.filter(groupAdmin=request.user)
+    events_list = []
+    for group in groups_list:
+        events_list.extend(Event.objects.filter(groupName=group.groupName,groupAdmin=group.groupAdmin))
+    event_debt = {}
+    for event in events_list:
+        if(event.eventType=='unequal'):
+            bearer = eval(event.bearers)
+            if request.user.username in bearer :
+                event_debt[event]=bearer[request.user.username]
+            
+        elif(event.eventType=='equal'):
+            payers = eval(event.payers)
+            print(payers)
+                
+            total_event_paid = 0
+            for paid_amount in payers.values():
+                total_event_paid=total_event_paid+paid_amount
+                
+            group_objects = Group.objects.filter(groupName = event.groupName,groupAdmin = event.groupAdmin)
+            totol_members_in_group=1
+            
+            for group_object in group_objects:
+                totol_members_in_group +=1
+
+            user_net_amount = 0
+            if request.user.username in payers:
+                user_net_amount += payers[request.user.username]                    
+            user_net_amount -= total_event_paid/totol_members_in_group     
+            event_debt[event]=user_net_amount
+    return render(request,'core/activity.html',{'event_debt':event_debt,'user_settlements':user_settlements})
+        
+            
+
+

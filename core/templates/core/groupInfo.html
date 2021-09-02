@@ -11,9 +11,9 @@ Group Info
     
     <h2>Group Members</h2>
     {%if members%}
-        {% for mem in members %}
+    {% for key, value in group_personal_debts.items %} 
 
-        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{mem.username}}</h1>
+        <h1 class='mt-5' style="text-align:center; color:#00796b;">{{key}} ----> {{ value }}</h1>
           <br>
           {% endfor %}
           {%else%}
